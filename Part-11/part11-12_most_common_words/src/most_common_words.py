@@ -14,8 +14,10 @@ def process_file(filename: str):
 
 
 def most_common_words(filename: str, lower_limit: int):
-    pass
+    words = process_file(filename)
 
+    return {word: words.count(word) for word in words if words.count(word) >= lower_limit}
+    
 
 if __name__ == "__main__":
-    print(process_file("programming.txt"))
+    print(most_common_words("comprehensions.txt", 4))
