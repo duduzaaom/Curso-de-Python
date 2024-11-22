@@ -17,7 +17,8 @@ class Task:
         self.task_completed = True
 
     def __str__(self):
-        return f"{self.id}: {self.description} ({self.workload} hours), programmer {self.programmer} {"FINISHED" if self.task_completed else "NOT FINISHED"}"
+        status = "FINISHED" if self.task_completed else "NOT FINISHED"
+        return f"{self.id}: {self.description} ({self.workload} hours), programmer {self.programmer} {status}"
     
 
 class OrderBook:
@@ -72,41 +73,113 @@ class OrderBook:
                     
 
 class OrderBookApplication:
+    wrong_input = False
+
     def __init__(self):
         self.orderbook = OrderBook()
 
     def add_order(self):
+        OrderBookApplication.wrong_input = False
+
         description = input("description: ")
         programmer_workload = input("programmer and workload estimate: ")
 
         programmer = programmer_workload.split()[0]
-        workload = int(programmer_workload.split()[1])
+        try:
+            workload = int(programmer_workload.split()[1])
+        except:
+            print("erroneous input")
+            OrderBookApplication.wrong_input = True
+            return
 
         self.orderbook.add_order(description, programmer, workload)
 
         print("added!")
 
+    def finished_tasks(self):
+        tasks_finished = self.orderbook.finished_orders()
+
+        if len(tasks_finished) > 0:
+            for task in tasks_finished:
+                print(task)
+        else:
+            print("no finished tasks")
+
+    def unfinished_tasks(self):
+        tasks_unfinished = self.orderbook.unfinished_orders()
+
+        if len(tasks_unfinished) > 0:
+            for task in tasks_unfinished:
+                print(task)
+        else:
+            print("no unfinished tasks")
+
+    def mark_as_finished(self):
+        OrderBookApplication.wrong_input = False
+
+        try:
+            id = int(input("id: "))
+        except:
+            print("erroneous input")
+            OrderBookApplication.wrong_input = True
+            return
+        
+        if id not in [task.id for task in self.orderbook.all_orders()]:
+            print("erroneous input")
+            OrderBookApplication.wrong_input = True
+            return
+
+        self.orderbook.mark_finished(id)
+        print("marked as finished")
+
+    def get_programmers(self):
+        for programmer in self.orderbook.programmers():
+            print(programmer)
+
+    def programmer_status(self):
+        OrderBookApplication.wrong_input = False
+
+        programmer = input("programmer: ")
+        if programmer not in self.orderbook.programmers():
+            print("erroneous input")
+            OrderBookApplication.wrong_input = True
+            return
+
+        finished_tasks, unfinished_tasks, finished_time, unfinished_time = self.orderbook.status_of_programmer(programmer)
+
+        print(f"tasks: finished {finished_tasks} not finished {unfinished_tasks}, hours: done {finished_time} scheduled {unfinished_time}")
+
     def execute(self):
         print("commands:")
-        print("0 exit\n1 add order\n2 list finished tasks\n3 list unfinished tasks\n4 mark task as finished\n5 programmers\n6 status of programmer\n")
+        print("0 exit\n1 add order\n2 list finished tasks\n3 list unfinished tasks\n4 mark task as finished\n5 programmers\n6 status of programmer")
 
         while True:
+            print()
             command = int(input("command: "))
 
             if command == 0:
                 break
             elif command == 1:
                 self.add_order()
+                if OrderBookApplication.wrong_input:
+                    continue
             elif command == 2:
-                pass
-                
+                self.finished_tasks()
+            elif command == 3:
+                self.unfinished_tasks()
+            elif command == 4:
+                self.mark_as_finished()
+                if OrderBookApplication.wrong_input:
+                    continue
+            elif command == 5:
+                self.get_programmers()
+            elif command == 6:
+                self.programmer_status()
+                if OrderBookApplication.wrong_input:
+                    continue
 
 
+program = OrderBookApplication()
+program.execute()
 
-if __name__ == "__main__":
-    program = OrderBookApplication()
-    # program.execute()
-    program.add_order()
 
-    for task in program.orderbook.all_orders():
-        print(task)
