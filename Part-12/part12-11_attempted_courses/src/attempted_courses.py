@@ -7,4 +7,18 @@ class CourseAttempt:
     def __str__(self):
         return f"{self.student_name}, grade for the course {self.course_name} {self.grade}"
 
-# Write your solution here
+def names_of_students(attempts: list):
+    return list(map(lambda course_attempt: course_attempt.student_name, attempts))
+
+def course_names(attempts: list):
+    unique_course_names = set(map(lambda attempt: attempt.course_name, attempts))
+    return sorted(list(unique_course_names))
+
+
+if __name__ == "__main__":
+    s1 = CourseAttempt("Peter Python", "Introduction to Programming", 3)
+    s2 = CourseAttempt("Olivia C. Objective", "Introduction to Programming", 5)
+    s3 = CourseAttempt("Peter Python", "Advanced Course in Programming", 2)
+
+    for name in course_names([s1, s2, s3]):
+        print(name)
