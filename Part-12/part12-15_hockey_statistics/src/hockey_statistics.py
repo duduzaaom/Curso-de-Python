@@ -115,7 +115,7 @@ main()
 
 if __name__ == "__main__":
     program = HockeyPlayerApplication()
-    # program.execute()
+    program.execute()
     program.process_file("partial.json")
     program.list_most_goals()
 
